@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Aligent_Multishippingfix>
+            <version>0.1.0</version>
+        </Aligent_Multishippingfix>
+    </modules>
+    <global>
+        <models>
+            <multishippingfix>
+                <class>Aligent_Multishippingfix_Model</class>
+            </multishippingfix>
+            <checkout>
+                <rewrite>
+                    <type_multishipping>Aligent_Multishippingfix_Model_Type_Multishipping</type_multishipping>
+                </rewrite>
+            </checkout>
+            <sales>
+                <rewrite>
+                    <order_payment>Aligent_Multishippingfix_Model_Order_Payment</order_payment>
+                </rewrite>
+            </sales>
+        </models>
+    </global>
+    <phpunit>
+        <suite>
+            <modules>
+                <Aligent_Multishippingfix/>
+            </modules>
+        </suite>
+    </phpunit>
+</config>
