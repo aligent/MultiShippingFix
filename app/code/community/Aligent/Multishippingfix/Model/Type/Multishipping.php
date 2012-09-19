@@ -15,11 +15,11 @@ class Aligent_Multishippingfix_Model_Type_Multishipping extends Mage_Checkout_Mo
     // See Jim's Skype re: unit test for configs.
     
     public function createOrders() {
-        parent::createOrders();
+        return parent::createOrders();
     }
     
     public function _prepareOrder(Mage_Sales_Model_Quote_Address $address) {
-        parent::_prepareOrder($address);
+        return parent::_prepareOrder($address);
     }
     
 }
