@@ -27,9 +27,13 @@ class Aligent_Multishippingfix_Model_Type_Multishipping extends Mage_Checkout_Mo
             foreach ($shippingAddresses as $address) {
                 $order = $this->_prepareOrder($address);
                 if (false === $summaryOrder->getBillingAddress()) {
+                    // If this is the first order (After we've seen the first
+                    // order, th summary order's billing address should be set),
+                    // then use it to create the summary order with all of the 
+                    // necessary fields.
                     $summaryOrder->setIncrementId($order->getIncrementId());
-                    $summaryOrder->setBillingAddress($order->getBillingAddress());
-                    $summaryOrder->setShippingAddress($order->getShippingAddress());
+                    $summaryOrder->setBillingAddress(clone $order->getBillingAddress());
+                    $summaryOrder->setShippingAddress(clone $order->getShippingAddress());
 
                     $summaryOrder->setBillingAddressId($order->getBillingAddressId());
                     $summaryOrder->setCustomerGender($order->getCustomerGender());
@@ -66,6 +70,7 @@ class Aligent_Multishippingfix_Model_Type_Multishipping extends Mage_Checkout_Mo
                     $summaryOrder->setUpdatedAt($order->getUpdatedAt());
                     $summaryOrder->setXForwardedFor($order->getXForwardedFor());
                 }
+                // For every order, collect the totals in the summary order
                 $summaryOrder->setAdjustmentNegative($summaryOrder->getAdjustmentNegative() + $order->getAdjustmentNegative());
                 $summaryOrder->setAdjustmentPositive($summaryOrder->getAdjustmentPositive() + $order->getAdjustmentPositive());
                 $summaryOrder->setBaseAdjustmentNegative($summaryOrder->getBaseAdjustmentNegative() + $order->getBaseAdjustmentNegative());
@@ -151,18 +156,31 @@ class Aligent_Multishippingfix_Model_Type_Multishipping extends Mage_Checkout_Mo
                 );
             }
 
+            // Get the quote object, the convert_quote object, and use these
+            // to get a payment object to attach to the summary order.
+            // This code was taken from the standard _prepareOrder method()
             $quote = $this->getQuote();
             $convertQuote = Mage::getSingleton('sales/convert_quote');
             $summaryOrder->setPayment($convertQuote->paymentToOrderPayment($quote->getPayment()));
             if (Mage::app()->getStore()->roundPrice($address->getGrandTotal()) == 0) {
                 $summaryOrder->getPayment()->setMethod('free');
             }
+            // Place the summary order
             $summaryOrder->place();
             
+            // Get the payment object from the summary order, and attach it to 
+            // each of the multishipping orders.
+            // The payment object must be set before it is saved, otherwise 
+            // when setPayment is called, in Mage_Sales_Model_Order::addPayment()
+            // the payment object will have an ID, and won't be added to the 
+            // payments collection object for the order
             $summaryPayment = $summaryOrder->getPayment();
             foreach ($orders as $order) {
                 $order->setPayment(clone $summaryPayment);
             }
+            
+            // Save each multishipping order.
+            // Note: the summary order is NOT saved.
             foreach ($orders as $order) {
                 $order->save();
                 if ($order->getCanSendNewEmailFlag()) {
