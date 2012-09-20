@@ -10,11 +10,13 @@ class Aligent_Multishippingfix_Test_Config_Config extends EcomDev_PHPUnit_Test_C
     public function testClassAliases(){
         $this->assertModelAlias('multishippingfix/order_payment', 'Aligent_Multishippingfix_Model_Order_Payment');
         $this->assertModelAlias('multishippingfix/type_multishipping', 'Aligent_Multishippingfix_Model_Type_Multishipping');
+        $this->assertModelAlias('multishippingfix/order', 'Aligent_Multishippingfix_Model_Order');
     }
     
     public function testClassRewrites() {
         $this->assertModelAlias('checkout/type_multishipping', 'Aligent_Multishippingfix_Model_Type_Multishipping');
         $this->assertModelAlias('sales/order_payment', 'Aligent_Multishippingfix_Model_Order_Payment');
+        $this->assertModelAlias('sales/order', 'Aligent_Multishippingfix_Model_Order');
     }
     
 }
