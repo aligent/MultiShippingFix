@@ -161,22 +161,34 @@ class Aligent_Multishippingfix_Model_Type_Multishipping extends Mage_Checkout_Mo
             // This code was taken from the standard _prepareOrder method()
             $quote = $this->getQuote();
             $convertQuote = Mage::getSingleton('sales/convert_quote');
-            $summaryOrder->setPayment($convertQuote->paymentToOrderPayment($quote->getPayment()));
+            $summaryPayment = $convertQuote->paymentToOrderPayment($quote->getPayment());
+            $summaryPayment->setParentOrderIncrementId($summaryOrder->getIncrementId());
+            $summaryOrder->setPayment($summaryPayment);
             if (Mage::app()->getStore()->roundPrice($address->getGrandTotal()) == 0) {
                 $summaryOrder->getPayment()->setMethod('free');
             }
             // Place the summary order
             $summaryOrder->place();
             
-            // Get the payment object from the summary order, and attach it to 
-            // each of the multishipping orders.
+            // Attach the summary payment object to each of the multishipping orders.
             // The payment object must be set before it is saved, otherwise 
             // when setPayment is called, in Mage_Sales_Model_Order::addPayment()
             // the payment object will have an ID, and won't be added to the 
             // payments collection object for the order
-            $summaryPayment = $summaryOrder->getPayment();
+            $summaryRelatedObjects = $order->getRelatedObjects();
             foreach ($orders as $order) {
                 $order->setPayment(clone $summaryPayment);
+                foreach ($summaryRelatedObjects as $relatedObject) {
+                    $order->addRelatedObject(clone $relatedObject);
+                }
+                $order->getPayment()->multishippingfixCapture(null);
+                $order->setState(
+                        $summaryOrder->getState(),
+                        $summaryOrder->getStatus(),
+                        $summaryOrder->getCustomerNote(),
+                        $summaryOrder->getCustomerNoteNotify()
+                );
+
             }
             
             // Save each multishipping order.

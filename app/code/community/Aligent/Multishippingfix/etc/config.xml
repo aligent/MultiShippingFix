@@ -22,6 +22,14 @@
                 </rewrite>
             </sales>
         </models>
+        <resources>
+            <multishippingfix_setup>
+                <setup>
+                    <module>Aligent_Multishippingfix</module>
+                    <class>Mage_Sales_Model_Mysql4_Setup</class>
+                </setup>
+            </multishippingfix_setup>
+        </resources>
     </global>
     <phpunit>
         <suite>

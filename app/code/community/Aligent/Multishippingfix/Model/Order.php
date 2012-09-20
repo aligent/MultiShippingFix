@@ -17,9 +17,11 @@ class Aligent_Multishippingfix_Model_Order extends Mage_Sales_Model_Order {
         $trace = debug_backtrace();
         if (isset($trace[1])
                 && isset($trace[1]['object'])
-                && $trace[1]['object'] instanceof Mage_Payment_Model_Method_Abstract) {
+                && $trace[1]['object'] instanceof Mage_Payment_Model_Method_Abstract
+                && !is_null($this->getPayment())
+                && !is_null($this->getPayment()->getParentOrderIncrementId())) {
 
-            $foo = true;
+            return $this->getPayment()->getParentOrderIncrementId();
         }
         return parent::getIncrementId();
     }
