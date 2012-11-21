@@ -158,10 +158,17 @@ class Aligent_Multishippingfix_Model_Type_Multishipping extends Mage_Checkout_Mo
                         $summaryOrder->getCustomerNoteNotify()
                 );
             }
-
+            
+            //now capture the summary payment
+            $summaryPayment->unsParentOrderIncrementId()->place();
+            
             // Save each multishipping order.
             // Note: the summary order is NOT saved.
             foreach ($orders as $order) {
+                /* @var $order Mage_Sales_Model_Order */
+                //save the transaction ID onto each child order payment for reference/reconciliation
+                $order->getPayment()->setLastTransId($summaryPayment->getLastTransId());
+                $order->addStatusHistoryComment(Mage::helper('sales')->__('Multishippingfix Payment Capture. Transaction ID: "%s"', $summaryPayment->getLastTransId()), false);
                 $order->save();
                 if ($order->getCanSendNewEmailFlag()) {
                     $order->sendNewOrderEmail();
