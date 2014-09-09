@@ -19,6 +19,7 @@
                 <rewrite>
                     <order_payment>Aligent_Multishippingfix_Model_Order_Payment</order_payment>
                     <order>Aligent_Multishippingfix_Model_Order</order>
+                    <order_invoice_total_discount>Aligent_Multishippingfix_Model_Sales_Order_Invoice_Total_Discount</order_invoice_total_discount>
                 </rewrite>
             </sales>
         </models>
